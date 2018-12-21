@@ -70,8 +70,8 @@ class Youku(VideoExtractor):
 
 
     #从url中获取vid
-    def get_vid_form_url(self):
-        # 不可靠 check #1633
+    def get_vid_from_url(self):
+
         b64p = r'([a-zA-Z0-9=]+)'
         p_list = [r'youku\.com/v_show/id_' + b64p,
                   r'player\.youku\.com/player\.php/sid/' + b64p + r'/v\.swf',
@@ -90,7 +90,9 @@ class Youku(VideoExtractor):
         if not self.url:
             raise Exception('No url')
         self.page = get_content(self.url)
-        hit = re.search(r'videoId2:"([A-Za-z0-9=]+)"', self.page)
+        b64p = r'([a-zA-Z0-9=]+)'
+        str = 'videoId2: \'(.+)\''
+        hit = re.search(str, self.page)
         if hit is not None:
             self.vid = hit.group(1)
 
@@ -112,6 +114,7 @@ class Youku(VideoExtractor):
         #创建请求头
         headers = dict(Referer=self.referer)
         headers['User-Agent'] = self.ua
+        self.UpsUrl = url
         api_meta = json.loads(get_content(url, headers=headers))
 
         self.api_data = api_meta['data']
@@ -119,22 +122,16 @@ class Youku(VideoExtractor):
         if data_error:
             self.api_error_code = data_error.get('code')
             self.api_error_msg = data_error.get('note')
-        if 'videos' in self.api_data:
-            if 'list' in self.api_data['videos']:
-                self.video_list = self.api_data['videos']['list']
-                for i in range(len(self.video_list)):
-                    print(self.video_list[i]['title'])
-                    stream = self.api_data['stream']
-                    for j in stream:
-                        print(j['m3u8_url'])
 
-
-            if 'next' in self.api_data['videos']:
-                self.video_next = self.api_data['videos']['next']
-                #for i in range(len(self.video_next)):
-                    #print(self.video_next[i])
-
-
+        if 'video' in self.api_data:
+            print('title:', self.api_data['video']['title'])
+        if 'stream' in self.api_data:
+            stream = self.api_data['stream']
+            for j in stream:
+                print("stream_type:", j['stream_type'])
+                segs = j['segs']
+                for k in segs:
+                    print(k['cdn_url'])
 
 
     def youku_ups_TV(self):
@@ -299,9 +296,9 @@ class Youku(VideoExtractor):
         req = urllib.request.urlopen(url)
         headers = req.getheaders()
         for header in headers:
-            if header[0].lower() == 'set-cookie':
-                n_v = header[1].split(';')[0]
-                name, value = n_v.split('=')
+            if header[0].lower() == 'set-cookie':  #元组中第0项字符串转换为小写对比是不是'set-cookie'
+                n_v = header[1].split(';')[0]       #根据分好分割出cna
+                name, value = n_v.split('=')        #根据分好分割出cna字段
                 if name == 'cna':
                     return quote_cna(value)
         log.w('It seems that the client failed to fetch a cna cookie. Please load your own cookie if possible')
