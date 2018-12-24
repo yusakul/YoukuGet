@@ -46,17 +46,28 @@ class Youku(VideoExtractor):
         {'id': 'mp4', 'container': 'mp4', 'video_profile': '标清'},
     ]
 
+    keys = [
+        'Mozilla/5.0 (Linux; Android 4.1.1; Nexus 7 Build/JRO03D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Safari/535.19',
+        'Mozilla/5.0 (Linux; U; Android 4.0.4; en-gb; GT-I9300 Build/IMM76D) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30',
+        'Mozilla/5.0 (Linux; U; Android 2.2; en-gb; GT-P1000 Build/FROYO) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1',
+        'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:21.0) Gecko/20100101 Firefox/21.0',
+        'Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0',
+        'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.94 Safari/537.36',
+        'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.133 Mobile Safari/535.19',
+        'Mozilla/5.0 (iPad; CPU OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3',
+        'Mozilla/5.0 (iPod; U; CPU like Mac OS X; en) AppleWebKit/420.1 (KHTML, like Gecko) Version/3.0 Mobile/3A101a Safari/419.3'
+    ]
 
     def __init__(self):
         super().__init__()
 
         # User Agent
-        self.ua = self.__class__.mobile_ua
+        #self.ua = self.__class__.mobile_ua
+        self.ua = self.keys[random.randint(0, len(self.keys) - 1)]
         self.referer = self.__class__.referer_youku
         self.ccode = ''
         # Found in http://g.alicdn.com/player/ykplayer/0.5.64/youku-player.min.js
 
-        self.ckey = 'DIl58SLFxFNndSV1GFNnMQVYkx1PP5tKe1siZu/86PR1u/Wh1Ptd+WOZsHHWxysSfAOhNJpdVWsdVJNsfJ8Sxd8WKVvNfAS8aS8fAOzYARzPyPc3JvtnPHjTdKfESTdnuTW6ZPvk2pNDh4uFzotgdMEFkzQ5wZVXl2Pf1/Y6hLK0OnCNxBj3+nb0v72gZ6b0td+WOZsHHWxysSo/0y9D2K42SaB8Y/+aD2K42SaB8Y/+ahU+WOZsHcrxysooUeND'
         self.utid = ""
         self.url = ""
         self.UpsUrl=""
@@ -100,14 +111,16 @@ class Youku(VideoExtractor):
 
     # 拼接ups链接
     def youku_ups(self):
-        #self.ccode = '0590'
         # + vid + ccode + client_ip + utid + client_ts + ckey + password
         url = 'https://ups.youku.com/ups/get.json?vid={}&ccode={}'.format(self.vid, self.ccode)
-        url += '&client_ip=192.168.1.1'
+        url += '&client_ip=192.168.1.2'
+
         self.utid = self.fetch_cna()
+        #self.utid = 'W59PmgAAACkDANk5JyfUl791'
         url += '&utid=' + self.utid
         #url += '&utid=' + self.getUtid().decode('utf-8')
         url += '&client_ts=' + str(int(time.time()))
+        self.ckey = 'DIl58SLFxFNndSV1GFNnMQVYkx1PP5tKe1siZu/86PR1u/Wh1Ptd+WOZsHHWxysSfAOhNJpdVWsdVJNsfJ8Sxd8WKVvNfAS8aS8fAOzYARzPyPc3JvtnPHjTdKfESTdnuTW6ZPvk2pNDh4uFzotgdMEFkzQ5wZVXl2Pf1/Y6hLK0OnCNxBj3+nb0v72gZ6b0td+WOZsHHWxysSo/0y9D2K42SaB8Y/+aD2K42SaB8Y/+ahU+WOZsHcrxysooUeND'
         url += '&ckey=' + urllib.parse.quote(self.ckey) #编码操作
 
         if self.password_protected:
@@ -136,7 +149,7 @@ class Youku(VideoExtractor):
     def youku_ups_TV(self):
         # + vid + ccode + client_ip + utid + client_ts + ckey + password
         url = 'https://ups.cp31.ott.cibntv.net/ups/get.json?vid={}&ccode={}'.format(self.vid,  self.ccode)
-        url += '&client_ip=192.168.1.1'
+        url += '&client_ip=192.168.1.5'
         self.utid = self.fetch_cna()
         url += '&utid=' + self.utid
         url += '&client_ts=' + str(int(time.time()))
@@ -207,10 +220,9 @@ class Youku(VideoExtractor):
             if (self.vid == None):
                 print("找不到vid")
 
+        #ccodelist = ['0401', "0505",  "050F", "0501", "0502","0510", "0502", "0507", "0508", "0512", "0513", "0514", "0503", "0590", '01010203', '0103010102', '0512']
 
-        ccodelist = ['0401', "0505",  "050F", "0501", "0502","0510", "0502", "0507", "0508", "0512", "0513", "0514", "0503", "0590", '01010203',
-                     '0103010102', '0512']
-        ccodelist = ["0503"]
+        ccodelist = ["0502", "0503", "0590"]
         for ccode in ccodelist:
             self.ccode = ccode
             self.youku_ups()

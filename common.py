@@ -58,36 +58,6 @@ def get_content(url, headers = {}, decoded = True):
     #打印日志
     logging.debug('get-content：%s' % url)
 
-    '''
-    # 创建cookiejar实例对象
-    cookie = cookiejar.CookieJar()
-
-    # 根据创建的cookie生成cookie的管理器
-    cookie_handle = request.HTTPCookieProcessor(cookie)
-
-    # 创建http请求管理器
-    http_handle = request.HTTPHandler()
-
-    # 创建https管理器
-    https_handle = request.HTTPSHandler()
-
-    # 创建求求管理器，将上面3个管理器作为参数属性
-    # 有了opener，就可以替代urlopen来获取请求了
-    opener = request.build_opener(cookie_handle, http_handle, https_handle)
-
-    # 将数据解析成urlencode格式
-    headers = parse.urlencode(headers)
-
-    req = request.Request(url, headers=headers)
-
-    # 正常是用request.urlopen(),这里用opener.open()发起请求
-    response = opener.open(req)
-
-    data = response.read()  # 读取回复
-
-    '''
-
-
 
     #用Request类构建了一个完整的请求
     req = request.Request(url, headers=headers)
