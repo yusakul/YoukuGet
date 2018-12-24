@@ -1,51 +1,40 @@
 # -*- coding: UTF-8 -*-
+import sys
+from time import sleep
+
 from youku import *
 
-def start():
-    print("请输入视频链接:")
-    #iput_url = input()
-    iput_url = 'http://v.youku.com/v_show/id_XNDkyODQwNjgw==.html'
-    #iput_url = 'https://v.youku.com/v_show/id_XMzUwMTYwMDM2MA==.html?spm=a2hmv.20009921.yk-slide-249196.5~5~5~5!2~A'
-    print(iput_url)
-    print("===============================")
-
-    you = Youku()
-    you.url = iput_url
-
-    if(you.get_vid_from_url() == None):
-       you.get_vid_from_page()
-       if(you.vid == None):
-           print("找不到vid")
-
-    #you.youku_ups()
-    #you.youku_ups_TV()
-
-    ccodelist = ['0401',"0510", "0502", "0507", "0508", "0512", "0513", "0514", "0503", "0590", '01010203','0103010102' ,'0512']
-    for ccode in ccodelist:
-        you.ccode = ccode
-        you.youku_ups()
-        if you.api_data.get('stream') is not None:
-            break
-
-    if you.api_data.get('stream') is None:
-        for ccode in ccodelist:
-            you.ccode = ccode
-            you.youku_ups_TV()
-            if you.api_data.get('stream') is not None:
-                break
-
-    if you.api_data.get('stream') is None:
-        if you.api_error_msg:
-            log.wtf(you.api_error_msg)
-        else:
-            log.wtf('Unknown error')
-
-
-    print("===============================")
-    print('UpsUrl:', you.UpsUrl)
-    print("===============================")
-
-start()
 
 
 
+
+
+you = Youku()
+
+you.iput_url = 'http://v.youku.com/v_show/id_XNDkyODQwNjgw==.html'
+you.iput_url = 'http://v.youku.com/v_show/id_XMTg2MDkwMjU2OA==.html?from=y1.3-movie-grid-1095-9921.217752.1-1'
+you.start()
+
+print("===============================")
+print('UpsUrl:', you.UpsUrl)
+print("===============================")
+
+print('title:', you.title)
+
+if '3gphd' in you.streams:
+    stream_type = you.streams['mp4hd2v2']
+    print("|格式: ", stream_type['container']," |清晰度: ", stream_type['video_profile'], "|大小: ",   int(stream_type['size']/1024/1024),"MB|")
+    for i in stream_type['src']:
+        print(i)
+
+
+
+'''
+stdout_backup = sys.stdout
+log_file = open("C:\\Users\\tfs\\Desktop\\message.log", "w")
+sys.stdout = log_file
+
+log_file.close()
+sys.stdout = stdout_backup
+
+'''

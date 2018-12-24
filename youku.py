@@ -37,8 +37,8 @@ class Youku(VideoExtractor):
 
         {'id': 'mp4hd', 'container': 'mp4', 'video_profile': '高清'},
         # not really equivalent to mp4hd
-        {'id': 'flvhd', 'container': 'flv', 'video_profile': '渣清'},
-        {'id': '3gphd', 'container': 'mp4', 'video_profile': '渣清'},
+        {'id': 'flvhd', 'container': 'flv', 'video_profile': '低清480P'},
+        {'id': '3gphd', 'container': 'mp4', 'video_profile': '低清480P'},
 
         {'id': 'mp4sd', 'container': 'mp4', 'video_profile': '标清'},
         # obsolete?
@@ -55,10 +55,12 @@ class Youku(VideoExtractor):
         self.referer = self.__class__.referer_youku
         self.ccode = ''
         # Found in http://g.alicdn.com/player/ykplayer/0.5.64/youku-player.min.js
+
         self.ckey = 'DIl58SLFxFNndSV1GFNnMQVYkx1PP5tKe1siZu/86PR1u/Wh1Ptd+WOZsHHWxysSfAOhNJpdVWsdVJNsfJ8Sxd8WKVvNfAS8aS8fAOzYARzPyPc3JvtnPHjTdKfESTdnuTW6ZPvk2pNDh4uFzotgdMEFkzQ5wZVXl2Pf1/Y6hLK0OnCNxBj3+nb0v72gZ6b0td+WOZsHHWxysSo/0y9D2K42SaB8Y/+aD2K42SaB8Y/+ahU+WOZsHcrxysooUeND'
         self.utid = ""
         self.url = ""
         self.UpsUrl=""
+        self.iput_url=""
 
         self.page = None
         self.video_list = None
@@ -123,15 +125,12 @@ class Youku(VideoExtractor):
             self.api_error_code = data_error.get('code')
             self.api_error_msg = data_error.get('note')
 
-        if 'video' in self.api_data:
-            print('title:', self.api_data['video']['title'])
-        if 'stream' in self.api_data:
-            stream = self.api_data['stream']
-            for j in stream:
-                print("stream_type:", j['stream_type'])
-                segs = j['segs']
-                for k in segs:
-                    print(k['cdn_url'])
+
+        if 'videos' in self.api_data:
+            if 'list' in self.api_data['videos']:
+                self.video_list = self.api_data['videos']['list']
+            if 'next' in self.api_data['videos']:
+                self.video_next = self.api_data['videos']['next']
 
 
     def youku_ups_TV(self):
@@ -142,6 +141,7 @@ class Youku(VideoExtractor):
         url += '&utid=' + self.utid
         url += '&client_ts=' + str(int(time.time()))
 
+        #self.ckey = 'fdffd'
         self.ckey = '7B19C0AB12633B22E7FE81271162026020570708D6CC189E4924503C49D243A0DE6CD84A766832C2C99898FC5ED31F3709BB3CDD82C96492E721BDD381735026'
         url += '&ckey=' + urllib.parse.quote(self.ckey)  # 编码操作
 
@@ -160,123 +160,12 @@ class Youku(VideoExtractor):
         if data_error:
             self.api_error_code = data_error.get('code')
             self.api_error_msg = data_error.get('note')
-           # print("code:", self.api_error_code)
-            #print("note:", self.api_error_msg)
+
         if 'videos' in self.api_data:
             if 'list' in self.api_data['videos']:
                 self.video_list = self.api_data['videos']['list']
-                for i in range(len(self.video_list)):
-                    print(self.video_list[i]['title'])
-                    stream = self.api_data['stream']
-                    for j in stream:
-                        print(j['m3u8_url'])
-
             if 'next' in self.api_data['videos']:
                 self.video_next = self.api_data['videos']['next']
-
-
-
-    def getUtid(self):
-        randomInt = random.uniform(-2147483648,2147483648) #0x80000000
-        str2 = '%d' % randomInt
-        i = int(time.time())
-        j = int(random.uniform(-2147483648,2147483648))
-        listOfByte1 = self.aa(i);
-        listOfByte2 = self.aa(j);
-        List = listOfByte1 + listOfByte2
-        List.append(3)
-        List.append(0)
-        List = List + self.aa(self.ca(str2))
-        sign = self.get_signature(self.bb(List))
-        List = List + self.aa(self.cb(sign))
-        str1 = "".join(str(i) for i in List)
-        return base64.b64encode(self.ba(str1).encode('utf-8'))
-
-
-
-    def aa(self, paramInt):
-        i = paramInt % 0x100
-        paramInt = paramInt >> 8
-        j = paramInt % 0x100
-        paramInt = paramInt >> 8
-        k = paramInt % 0x100
-        paramInt = paramInt >> 8
-        n = paramInt % 0x100
-        list = [n, k, j, i];
-        return list;
-
-    def ba(self, List):
-        str = ""
-        for i in List:
-            str =  str + i
-
-        return str
-
-    def bb(self, List):
-        str = ""
-        for i in List:
-            str =  str + chr(i)
-
-        return str
-
-    def ca(self, paramString):
-        i=0
-        k=0
-        if( len(paramString) <= 0 ):
-            return k
-        paramlist = list(paramString)
-        List = list()
-        for n in paramlist:
-            List.append(ord(n))
-
-        j=0
-        while(1):
-            k = i
-            if(j >= len(List)-1):
-                break;
-            i = self.intval32(i*31 + List[j])
-            j+=1
-
-        return k
-
-    def cb(self, paramString):
-        i = 0
-        k = 0
-        if (len(paramString) <= 0):
-            return k
-        paramlist = list(paramString)
-        List = list()
-        for n in paramlist:
-            List.append(n)
-
-        j = 0
-        while (1):
-            k = i
-            if (j >= len(List) - 1):
-                break;
-            i = self.intval32(i * 31 + List[j])
-            j += 1
-
-        return k
-
-
-
-    def intval32(self, num):
-        num = num & 0xFFFFFFFF
-        p = num>>31
-        if(p==1):
-            num = num-1
-            num = ~num
-            num = num & 0xFFFFFFFF
-            return num -1
-        else:
-            return  num
-
-    def get_signature(self, str):
-        key = "d6fc3a4a06adbde89223bvefedc24fecde188aaa9161";
-        macStr = hmac.new(key.encode('utf-8'), str.encode('utf-8'), 'sha1').hexdigest()
-        signature = base64.b64encode(macStr.encode('utf-8'))
-        return signature
 
     def fetch_cna(self):
 
@@ -303,6 +192,87 @@ class Youku(VideoExtractor):
                     return quote_cna(value)
         log.w('It seems that the client failed to fetch a cna cookie. Please load your own cookie if possible')
         return quote_cna('DOG4EdW4qzsCAbZyXbU+t7Jt')
+
+    def start(self):
+        # print("请输入视频链接:")
+        # iput_url = input()
+
+        # print(iput_url)
+        # print("===============================")
+
+        self.url = self.iput_url
+
+        if (self.get_vid_from_url() == None):
+            self.get_vid_from_page()
+            if (self.vid == None):
+                print("找不到vid")
+
+        ccodelist = ['0401', "0505", "0502", "0501", "050F", "0510", "0502", "0507", "0508", "0512", "0513", "0514", "0503", "0590", '01010203',
+                     '0103010102', '0512']
+
+
+        for ccode in ccodelist:
+            self.ccode = ccode
+            self.youku_ups()
+            if self.api_data.get('stream') is not None:
+                break
+
+        if self.api_data.get('stream') is None:
+            for ccode in ccodelist:
+                self.ccode = ccode
+                self.youku_ups_TV()
+                if self.api_data.get('stream') is not None:
+                    break
+
+        if self.api_data.get('stream') is None:
+            if self.api_error_msg:
+                log.wtf(self.api_error_msg)
+            else:
+                log.wtf('Unknown error')
+
+        self.title = self.api_data['video']['title']
+        stream_types = dict([(i['id'], i) for i in self.stream_types])
+        audio_lang = self.api_data['stream'][0]['audio_lang']
+
+        for stream in self.api_data['stream']:
+            stream_id = stream['stream_type']
+
+            if stream_id in stream_types and stream['audio_lang'] == audio_lang:
+                if 'alias-of' in stream_types[stream_id]:
+                    stream_id = stream_types[stream_id]['alias-of']
+
+                if stream_id not in self.streams:
+                    self.streams[stream_id] = {
+                        'container': stream_types[stream_id]['container'],
+                        'video_profile': stream_types[stream_id]['video_profile'],
+                        'size': stream['size'],
+                        'pieces': [{
+                            'segs': stream['segs']
+                        }],
+                        'm3u8_url': stream['m3u8_url']
+                    }
+
+                    src = []
+                    for seg in stream['segs']:
+                         src.append(seg['cdn_url'])
+                    self.streams[stream_id]['src'] = src
+                else:
+                    self.streams[stream_id]['size'] += stream['size']
+                    self.streams[stream_id]['pieces'].append({
+                        'segs': stream['segs']
+                    })
+                    src = []
+                    for seg in stream['segs']:
+                        src.append(seg['cdn_url'])
+
+                    self.streams[stream_id]['src'].extend(src)
+
+
+
+
+
+
+
 
 
 
