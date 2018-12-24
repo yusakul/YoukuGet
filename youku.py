@@ -211,18 +211,13 @@ class Youku(VideoExtractor):
                      '0103010102', '0512']
 
 
-        for ccode in ccodelist:
-            self.ccode = ccode
-            self.youku_ups()
+        while(1):
+            self.ccode = "0502"
+            self.youku_ups_TV()
+            if self.api_data.get('stream') is not None:
+                self.youku_ups_TV()
             if self.api_data.get('stream') is not None:
                 break
-
-        if self.api_data.get('stream') is None:
-            for ccode in ccodelist:
-                self.ccode = ccode
-                self.youku_ups_TV()
-                if self.api_data.get('stream') is not None:
-                    break
 
         if self.api_data.get('stream') is None:
             if self.api_error_msg:
