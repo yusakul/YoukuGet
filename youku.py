@@ -207,17 +207,22 @@ class Youku(VideoExtractor):
             if (self.vid == None):
                 print("找不到vid")
 
-        ccodelist = ['0401', "0505", "0502", "0501", "050F", "0510", "0502", "0507", "0508", "0512", "0513", "0514", "0503", "0590", '01010203',
+
+        ccodelist = ['0401', "0505",  "050F", "0501", "0502","0510", "0502", "0507", "0508", "0512", "0513", "0514", "0503", "0590", '01010203',
                      '0103010102', '0512']
-
-
-        while(1):
-            self.ccode = "0502"
-            self.youku_ups_TV()
-            if self.api_data.get('stream') is not None:
-                self.youku_ups_TV()
+        ccodelist = ["0503"]
+        for ccode in ccodelist:
+            self.ccode = ccode
+            self.youku_ups()
             if self.api_data.get('stream') is not None:
                 break
+
+        if self.api_data.get('stream') is None:
+            for ccode in ccodelist:
+                self.ccode = ccode
+                self.youku_ups_TV()
+                if self.api_data.get('stream') is not None:
+                    break
 
         if self.api_data.get('stream') is None:
             if self.api_error_msg:

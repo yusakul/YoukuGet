@@ -13,6 +13,9 @@ you = Youku()
 
 you.iput_url = 'http://v.youku.com/v_show/id_XNDkyODQwNjgw==.html'
 you.iput_url = 'http://v.youku.com/v_show/id_XMTg2MDkwMjU2OA==.html?from=y1.3-movie-grid-1095-9921.217752.1-1'
+
+
+
 you.start()
 
 print("===============================")
