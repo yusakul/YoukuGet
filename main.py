@@ -20,20 +20,14 @@ if __name__ == '__main__':
 
     print('title:', you.title)
 
-    if '3gphd' in you.streams:
-        stream_type = you.streams['mp4hd2v2']
-        print("|格式: ", stream_type['container'], " |清晰度: ", stream_type['video_profile'], "|大小: ",
-              int(stream_type['size'] / 1024 / 1024), "MB|")
-        for i in stream_type['src']:
-            print(i)
+    for stream_type in you.streams:
+
+        print("|类型：",stream_type, "|格式: ", you.streams[stream_type]['container'], " |清晰度: ", you.streams[stream_type]['video_profile'], "|大小: ",
+              int(you.streams[stream_type]['size'] / 1024 / 1024), "MB|")
+        print("m3u8_url:",you.streams[stream_type]['m3u8_url'])
+        print('cnd_url:')
+        for cdn_url in you.streams[stream_type]['src']:
+            print(cdn_url)
+        print("===============================")
 
 
-'''
-stdout_backup = sys.stdout
-log_file = open("C:\\Users\\tfs\\Desktop\\message.log", "w")
-sys.stdout = log_file
-
-log_file.close()
-sys.stdout = stdout_backup
-
-'''

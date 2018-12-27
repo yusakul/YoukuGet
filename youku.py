@@ -20,9 +20,7 @@ from common import VideoExtractor
 class Youku(VideoExtractor):
 
     referer_youku = 'http://v.youku.com'
-    # Last updated: 2017-10-13
 
-    # Last updated: 2017-10-13
     stream_types = [
         {'id': 'hd3', 'container': 'flv', 'video_profile': '1080P'},
         {'id': 'hd3v2', 'container': 'flv', 'video_profile': '1080P'},
@@ -117,8 +115,9 @@ class Youku(VideoExtractor):
         url += '&client_ip=192.168.1.2'
 
         self.utid = self.fetch_cna()
-        #self.utid = 'W59PmgAAACkDANk5JyfUl791'
+        # self.utid = 'W59PmgAAACkDANk5JyfUl791'
         url += '&utid=' + self.utid
+
         #url += '&utid=' + self.getUtid().decode('utf-8')
         url += '&client_ts=' + str(int(time.time()))
         self.ckey = 'DIl58SLFxFNndSV1GFNnMQVYkx1PP5tKe1siZu/86PR1u/Wh1Ptd+WOZsHHWxysSfAOhNJpdVWsdVJNsfJ8Sxd8WKVvNfAS8aS8fAOzYARzPyPc3JvtnPHjTdKfESTdnuTW6ZPvk2pNDh4uFzotgdMEFkzQ5wZVXl2Pf1/Y6hLK0OnCNxBj3+nb0v72gZ6b0td+WOZsHHWxysSo/0y9D2K42SaB8Y/+aD2K42SaB8Y/+ahU+WOZsHcrxysooUeND'
@@ -227,6 +226,7 @@ class Youku(VideoExtractor):
         for ccode in ccodelist:
             self.ccode = ccode
             self.youku_ups()
+            time.sleep(1)
             if self.api_data.get('stream') is not None:
                 break
 
